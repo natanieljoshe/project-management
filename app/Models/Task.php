@@ -19,6 +19,9 @@ class Task extends Model
         'status',
         'file_path',
     ];
+    protected $casts = [
+        'deadline' => 'date',
+    ];
 
     public function project(): BelongsTo
     {
