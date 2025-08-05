@@ -6,6 +6,8 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\Attributes\Layout; 
+use App\Exports\ProjectsExport; 
+use Maatwebsite\Excel\Facades\Excel;
 
 #[Layout('layouts.app')] 
 class Index extends Component
@@ -76,6 +78,10 @@ class Index extends Component
         session()->flash('message', 'Project successfully deleted.');
     }
 
+     public function export() 
+    {
+        return Excel::download(new ProjectsExport, 'projects-and-tasks.xlsx');
+    }
 
     public function render()
     {
