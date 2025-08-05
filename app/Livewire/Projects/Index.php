@@ -14,10 +14,10 @@ class Index extends Component
     public bool $isProjectModalOpen = false;
 
     //buat cek, apakah project sedang diedit
-    public ?int $editingProjectId = null;
+   public ?string $editingProjectId = null;
 
     public bool $isConfirmingDelete = false;
-    public ?int $deletingProjectId = null;
+    public ?string $deletingProjectId = null;
 
     // Aturan validasi
     protected function rules()
@@ -96,7 +96,7 @@ class Index extends Component
     }
 
     //menghapus project
-    public function confirmDelete(int $projectId): void
+    public function confirmDelete(string $projectId): void
     {
         $this->deletingProjectId = $projectId;
         $this->isConfirmingDelete = true;

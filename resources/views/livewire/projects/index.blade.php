@@ -13,7 +13,7 @@
         </div>
     </header>
 
-    {{-- Konten Utama --}}
+    {{-- konten utama --}}
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
@@ -24,7 +24,7 @@
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {{-- Loop untuk setiap project --}}
+                {{-- loop untuk setiap project --}}
                 @forelse ($projects as $project)
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $project->name }}</h3>
@@ -41,12 +41,16 @@
                             </span>
                         </div>
                         <div class="mt-4 border-t dark:border-gray-700 pt-4 flex justify-between items-center">
-                            <x-primary-button class="!py-1 !px-3">{{ __('View / Manage') }}</x-primary-button>
+                            <a href="{{ route('projects.show', $project) }}" wire:navigate
+                                class="inline-flex items-center px-3 py-1 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                {{ __('View / Manage') }}
+                            </a>
                             <div class="flex gap-4">
-                                <button wire:click="edit({{ $project->id }})"
+                                {{-- tombol edit --}}
+                                <button wire:click="edit('{{ $project->id }}')"
                                     class="font-medium text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">Edit</button>
-                                {{-- Tombol Delete Baru --}}
-                                <button wire:click="confirmDelete({{ $project->id }})"
+                                {{-- tombol delete--}}
+                                <button wire:click="confirmDelete('{{ $project->id }}')" 
                                     class="font-medium text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">Delete</button>
                             </div>
                         </div>
@@ -132,7 +136,7 @@
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
                     This action cannot be undone.
                 </p>
-                
+
                 <div class="flex justify-end gap-4">
                     <x-secondary-button wire:click="$set('isConfirmingDelete', false)">
                         {{ __('Cancel') }}
