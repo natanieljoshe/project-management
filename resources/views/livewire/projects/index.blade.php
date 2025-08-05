@@ -43,16 +43,12 @@
                         <div class="mt-4 border-t dark:border-gray-700 pt-4 flex justify-between items-center">
                             <a href="{{ route('projects.show', $project) }}" wire:navigate
                                 class="inline-flex items-center px-3 py-1 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                {{ __('View / Manage') }}
+                                {{ __('Manage') }}
                             </a>
-                            <div class="flex gap-4">
-                                {{-- tombol edit --}}
-                                <button wire:click="edit('{{ $project->id }}')"
-                                    class="font-medium text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">Edit</button>
-                                {{-- tombol delete--}}
-                                <button wire:click="confirmDelete('{{ $project->id }}')" 
-                                    class="font-medium text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">Delete</button>
-                            </div>
+                            <button wire:click="confirmDelete('{{ $project->id }}')"
+                                class="font-medium text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">
+                                Delete
+                            </button>
                         </div>
                     </div>
                 @empty

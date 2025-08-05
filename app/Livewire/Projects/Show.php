@@ -20,7 +20,12 @@ class Show extends Component
     //menampung data project
     public Project $project;
 
-    //data dari task
+    //untuk edit project
+    public ?string $editingProjectDetail = null;
+    public string $newProjectName = '', $newProjectDescription = '', $newProjectDeadline = '', $newProjectStatus = '';
+
+
+    //untuk task
     public string $title = '';
     public string $description = '';
     public string $deadline = '';
@@ -47,6 +52,55 @@ class Show extends Component
     public string $searchQuery = '';
     public string $filterStatus = '';
     public string $filterDeadline = '';
+
+
+    //project
+    public function startEditing(string $field): void
+    {
+        $this->editingProjectDetail = $field;
+        $this->newProjectName = $this->project->name;
+        $this->newProjectDescription = $this->project->description;
+        $this->newProjectDeadline = $this->project->deadline->format('Y-m-d');
+        $this->newProjectStatus = $this->project->status;
+    }
+
+    public function cancelEditing(): void
+    {
+        $this->editingProjectDetail = null;
+    }
+
+    public function updateProjectDetail(string $field): void
+    {
+        $validatedData = [];
+        $updatePayload = [];
+
+        // validasi data dan prepare data
+        switch ($field) {
+            case 'name':
+                $validatedData = $this->validate(['newProjectName' => 'required|string|min:3']);
+                $updatePayload['name'] = $validatedData['newProjectName'];
+                break;
+            case 'description':
+                $validatedData = $this->validate(['newProjectDescription' => 'nullable|string']);
+                $updatePayload['description'] = $validatedData['newProjectDescription'];
+                break;
+            case 'deadline':
+                $validatedData = $this->validate(['newProjectDeadline' => 'required|date']);
+                $updatePayload['deadline'] = $validatedData['newProjectDeadline'];
+                break;
+            case 'status':
+                $validatedData = $this->validate(['newProjectStatus' => 'required|string']);
+                $updatePayload['status'] = $validatedData['newProjectStatus'];
+                break;
+        }
+
+        if (!empty($updatePayload)) {
+            $this->project->update($updatePayload);
+        }
+
+        $this->project->refresh();
+        $this->cancelEditing();
+    }
 
     //validasi untuk task baru
     protected function rules()

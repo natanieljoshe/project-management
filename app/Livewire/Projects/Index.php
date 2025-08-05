@@ -13,7 +13,7 @@ class Index extends Component
     public $name, $description, $deadline, $status;
     public bool $isProjectModalOpen = false;
 
-    //buat cek, apakah project sedang diedit
+    //buat cek, apakah project sedang dibuat
    public ?string $editingProjectId = null;
 
     public bool $isConfirmingDelete = false;
@@ -44,50 +44,9 @@ class Index extends Component
     }
 
 
-    public function edit(Project $project): void
-    {
-        // user hanya bisa mengedit proyek miliknya
-        if ($project->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $this->editingProjectId = $project->id;
-        $this->name = $project->name;
-        $this->description = $project->description;
-        $this->deadline = $project->deadline->format('Y-m-d');
-        $this->status = $project->status;
-
-        $this->isProjectModalOpen = true;
-    }
-
-    // menyimpan perubahan
-    public function update(): void
-    {
-        $validated = $this->validate();
-
-        $project = Project::findOrFail($this->editingProjectId);
-
-        // Pastikan user hanya bisa mengupdate proyek miliknya
-        if ($project->user_id !== Auth::id()) {
-            abort(403);
-        }
-        
-        $project->update($validated);
-
-        session()->flash('message', 'Project successfully updated.');
-
-        $this->closeModal();
-    }
-
     //simpan project baru
-     public function store(): void
+    public function store(): void
     {
-        //mode edit, panggil update()
-        if ($this->editingProjectId) {
-            $this->update();
-            return;
-        }
-
         $validated = $this->validate();
         $validated['user_id'] = Auth::id();
         Project::create($validated);

@@ -14,23 +14,35 @@
 
             {{-- kolom kiri (detail proyek) --}}
             <div class="md:col-span-1">
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 space-y-4">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Project Details</h3>
-                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        <strong class="text-gray-900 dark:text-gray-100">Description:</strong><br>
-                        {{ $project->description }}
-                    </p>
-                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        <strong class="text-gray-900 dark:text-gray-100">Deadline:</strong>
-                        {{ $project->deadline->format('d F Y') }}
-                    </p>
-                    <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        <strong class="text-gray-900 dark:text-gray-100">Status:</strong>
-                        <span
-                            class="px-2 py-1 text-xs font-semibold uppercase leading-5 text-green-800 dark:text-green-100 bg-green-100 dark:bg-green-800/50 rounded-full">
-                            {{ $project->status }}
-                        </span>
-                    </p>
+
+                    {{-- nama project --}}
+                    <x-inline-edit field="name" label="Name" :value="$project->name">
+                        <x-text-input wire:model="newProjectName" class="w-full" />
+                    </x-inline-edit>
+
+                    {{-- deskripsi --}}
+                    <x-inline-edit field="description" label="Description" :value="!empty($project->description) ? $project->description : 'Click to add description.'">
+                        <textarea wire:model="newProjectDescription" rows="4"
+                            class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full"></textarea>
+                    </x-inline-edit>
+
+                    {{-- deadline --}}
+                    <x-inline-edit field="deadline" label="Deadline" :value="$project->deadline->format('d F Y')">
+                        <x-text-input wire:model="newProjectDeadline" type="date" class="w-full" />
+                    </x-inline-edit>
+
+                    {{-- status --}}
+                    <x-inline-edit field="status" label="Status" :value="$project->status">
+                        <select wire:model="newProjectStatus"
+                            class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm block w-full">
+                            <option value="ON-GOING">On-Going</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="COMPLETED">Completed</option>
+                        </select>
+                    </x-inline-edit>
+
                 </div>
             </div>
 
@@ -169,7 +181,8 @@
     {{-- modal konfirmasi hapus --}}
     @if ($isConfirmingTaskDelete)
         <div class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="absolute inset-0 bg-black opacity-50" wire:click="$set('isConfirmingTaskDelete', false)"></div>
+            <div class="absolute inset-0 bg-black opacity-50" wire:click="$set('isConfirmingTaskDelete', false)">
+            </div>
             <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-md z-10">
                 <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Are you sure?</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">
