@@ -22,7 +22,8 @@ class Show extends Component
 
     //untuk edit project
     public ?string $editingProjectDetail = null;
-    public string $newProjectName = '', $newProjectDescription = '', $newProjectDeadline = '', $newProjectStatus = '';
+    public ?string $newProjectDescription = ''; 
+    public string $newProjectName = '', $newProjectDeadline = '', $newProjectStatus = '';
 
 
     //untuk task

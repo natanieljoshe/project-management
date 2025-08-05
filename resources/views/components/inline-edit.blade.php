@@ -22,6 +22,8 @@
         {{-- tempat yang diisi --}}
         {{ $slot }}
 
+        <x-input-error :messages="$errors->get('newProject' . ucfirst($field))" class="mt-2" />
+
         <div class="flex items-center gap-2 mt-2">
             <button wire:click="updateProjectDetail('{{ $field }}')"
                 class="text-xs font-bold text-green-600 dark:text-green-400 hover:underline">SAVE</button>
