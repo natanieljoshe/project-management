@@ -42,10 +42,12 @@
                         </div>
                         <div class="mt-4 border-t dark:border-gray-700 pt-4 flex justify-between items-center">
                             <x-primary-button class="!py-1 !px-3">{{ __('View / Manage') }}</x-primary-button>
-                            <div class="flex gap-2">
-                                {{-- Tombol Edit --}}
+                            <div class="flex gap-4">
                                 <button wire:click="edit({{ $project->id }})"
-                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">Edit</button>
+                                    class="font-medium text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">Edit</button>
+                                {{-- Tombol Delete Baru --}}
+                                <button wire:click="confirmDelete({{ $project->id }})"
+                                    class="font-medium text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -62,8 +64,8 @@
         </div>
     </div>
 
-    {{-- modal --}}
-    @if ($isModalOpen)
+    {{-- modal edit project dan create --}}
+    @if ($isProjectModalOpen)
         <div class="fixed inset-0 flex items-center justify-center z-50">
             <div class="absolute inset-0 bg-black opacity-50" wire:click="closeModal()"></div>
             <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-2xl z-10">
@@ -117,6 +119,29 @@
                         </x-primary-button>
                     </div>
                 </form>
+            </div>
+        </div>
+    @endif
+
+    {{-- modal konfirm delete --}}
+    @if ($isConfirmingDelete)
+        <div class="fixed inset-0 flex items-center justify-center z-50">
+            <div class="absolute inset-0 bg-black opacity-50" wire:click="$set('isConfirmingDelete', false)"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 w-full max-w-md z-10">
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Are you sure?</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                    This action cannot be undone.
+                </p>
+                
+                <div class="flex justify-end gap-4">
+                    <x-secondary-button wire:click="$set('isConfirmingDelete', false)">
+                        {{ __('Cancel') }}
+                    </x-secondary-button>
+
+                    <x-danger-button wire:click="delete()">
+                        {{ __('Yes, Delete It') }}
+                    </x-danger-button>
+                </div>
             </div>
         </div>
     @endif

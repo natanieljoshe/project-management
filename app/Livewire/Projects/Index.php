@@ -11,10 +11,13 @@ use Livewire\Attributes\Layout;
 class Index extends Component
 {
     public $name, $description, $deadline, $status;
-    public bool $isModalOpen = false;
+    public bool $isProjectModalOpen = false;
 
     //buat cek, apakah project sedang diedit
     public ?int $editingProjectId = null;
+
+    public bool $isConfirmingDelete = false;
+    public ?int $deletingProjectId = null;
 
     // Aturan validasi
     protected function rules()
@@ -31,12 +34,12 @@ class Index extends Component
      public function openModal(): void
     {
         $this->reset('name', 'description', 'deadline', 'status', 'editingProjectId');
-        $this->isModalOpen = true;
+        $this->isProjectModalOpen = true;
     }
 
     public function closeModal(): void
     {
-        $this->isModalOpen = false;
+        $this->isProjectModalOpen = false;
         $this->reset('name', 'description', 'deadline', 'status', 'editingProjectId');
     }
 
@@ -54,7 +57,7 @@ class Index extends Component
         $this->deadline = $project->deadline->format('Y-m-d');
         $this->status = $project->status;
 
-        $this->isModalOpen = true;
+        $this->isProjectModalOpen = true;
     }
 
     // menyimpan perubahan
@@ -90,6 +93,28 @@ class Index extends Component
         Project::create($validated);
         session()->flash('message', 'Project successfully created.');
         $this->closeModal();
+    }
+
+    //menghapus project
+    public function confirmDelete(int $projectId): void
+    {
+        $this->deletingProjectId = $projectId;
+        $this->isConfirmingDelete = true;
+    }
+
+    public function delete(): void
+    {
+        $project = Project::findOrFail($this->deletingProjectId);
+
+        // Keamanan: pastikan user hanya bisa menghapus proyek miliknya
+        if ($project->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $project->delete();
+
+        $this->isConfirmingDelete = false;
+        session()->flash('message', 'Project successfully deleted.');
     }
 
 
