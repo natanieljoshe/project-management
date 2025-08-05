@@ -24,10 +24,11 @@ class Dashboard extends Component
 
     public function updatedSelectedPriorityProject($projectId)
     {
+        $priorityIdToSave = ($projectId === '') ? null : $projectId;
         /** @var \App\Models\User|null $user */
         $user = Auth::user();
         if ($user) {
-            $user->update(['priority_project_id' => $projectId]);
+            $user->update(['priority_project_id' => $priorityIdToSave]);
             $this->dispatch('priority-updated');
         }
     }

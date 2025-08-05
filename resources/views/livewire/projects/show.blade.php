@@ -103,7 +103,7 @@
                         <div class="space-y-4">
                             @forelse ($tasks as $task)
                                 <div wire:key="list-task-{{ $task->id }}"
-                                    class="border dark:border-gray-700 rounded-lg p-4 flex justify-between items-center">
+                                    class="border dark:border-gray-700 rounded-lg p-4 flex justify-between items-center transition hover:shadow-md">
                                     <div wire:click="viewTask('{{ $task->id }}')"
                                         class="flex-grow cursor-pointer pr-4">
                                         <h4 class="font-bold text-gray-800 dark:text-gray-200">{{ $task->title }}</h4>
@@ -171,8 +171,9 @@
                                     <div data-status="{{ $status }}"
                                         class="kanban-column space-y-3 min-h-[100px]">
                                         @forelse ($tasksByStatus[$status] ?? [] as $task)
-                                            <div wire:key="task-{{ $task->id }}" data-id="{{ $task->id }}"
-                                                class="bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-grab group">
+                                            <div wire:key="kanban-task-{{ $task->id }}"
+                                                data-id="{{ $task->id }}"
+                                                class="bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-grab group transition hover:scale-105">
                                                 <div wire:click="viewTask('{{ $task->id }}')"
                                                     class="cursor-pointer">
                                                     <div class="flex items-center justify-between">

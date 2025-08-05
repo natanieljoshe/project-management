@@ -38,7 +38,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {{-- loop untuk setiap project --}}
                 @forelse ($projects as $project)
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 transition hover:shadow-lg">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $project->name }}</h3>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                             {{ Str::limit($project->description, 45) }}
