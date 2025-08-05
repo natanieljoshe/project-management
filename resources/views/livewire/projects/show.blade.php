@@ -53,74 +53,163 @@
                     <x-primary-button wire:click="openTaskModal()">+ New Task</x-primary-button>
                 </div>
 
+                <div class="mb-4 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700">
+                    <button wire:click="setViewMode('list')"
+                        class="py-2 px-3 text-sm font-medium {{ $viewMode === 'list' ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300' }}">
+                        List View
+                    </button>
+                    <button wire:click="setViewMode('kanban')"
+                        class="py-2 px-3 text-sm font-medium {{ $viewMode === 'kanban' ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300' }}">
+                        Board View
+                    </button>
+                </div>
+
                 @if (session()->has('task_message'))
                     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
                         <p>{{ session('task_message') }}</p>
                     </div>
                 @endif
 
-                {{-- kanban board --}}
-                <div x-data="{
-                    init() {
-                        document.querySelectorAll('.kanban-column').forEach(column => {
-                            new Sortable(column, {
-                                group: 'tasks',
-                                animation: 150,
-                                ghostClass: 'bg-blue-100',
-                                onEnd: (evt) => {
-                                    let taskId = evt.item.dataset.id;
-                                    let newStatus = evt.to.dataset.status;
-                                    @this.call('updateTaskStatus', taskId, newStatus);
-                                }
-                            });
-                        });
-                    }
-                }" x-init="init()">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                        @php
-                            $statuses = ['TODO', 'IN-PROGRESS', 'DONE'];
-                            $tasksByStatus = $project->tasks->groupBy('status');
-                        @endphp
-
-                        @foreach ($statuses as $status)
-                            <div class="bg-gray-100 dark:bg-gray-800/50 rounded-lg p-3">
-                                <h4 class="font-bold text-sm uppercase text-gray-500 dark:text-gray-400 mb-3 px-1">
-                                    {{ str_replace('-', ' ', $status) }}</h4>
-
-                                <div data-status="{{ $status }}" class="kanban-column space-y-3 min-h-[100px]">
-                                    @forelse ($tasksByStatus[$status] ?? [] as $task)
-                                        <div wire:key="task-{{ $task->id }}" data-id="{{ $task->id }}"
-                                            class="bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-grab group">
-                                            <div wire:click="viewTask('{{ $task->id }}')" class="cursor-pointer">
-                                                <div class="flex items-center justify-between">
-                                                    <p
-                                                        class="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                                                        {{ $task->title }}
-                                                    </p>
-                                                    {{-- Ikon diletakkan di sini --}}
-                                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                                        class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
-                                                        stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536l12.232-12.232z" />
-                                                    </svg>
-                                                </div>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                    Deadline: {{ $task->deadline->format('d M Y') }}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    @empty
-                                        {{-- Placeholder supaya kolom bisa menjadi target drop --}}
-                                    @endforelse
-                                </div>
+                {{-- mode list --}}
+                @if ($viewMode === 'list')
+                    <div>
+                        {{-- Filter & Pencarian --}}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <x-text-input wire:model.live.debounce.300ms="searchQuery" type="text" class="w-full"
+                                    placeholder="Search by title..." />
                             </div>
-                        @endforeach
+                            <div>
+                                <select wire:model.live="filterStatus"
+                                    class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">All Status</option>
+                                    <option value="TODO">To Do</option>
+                                    <option value="IN-PROGRESS">In Progress</option>
+                                    <option value="DONE">Done</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select wire:model.live="filterDeadline"
+                                    class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">All Deadlines</option>
+                                    <option value="today">Today</option>
+                                    <option value="past">Past Due</option>
+                                    <option value="future">Future</option>
+                                </select>
+                            </div>
+                        </div>
 
+                        {{-- task list --}}
+                        <div class="space-y-4">
+                            @forelse ($tasks as $task)
+                                <div wire:key="list-task-{{ $task->id }}"
+                                    class="border dark:border-gray-700 rounded-lg p-4 flex justify-between items-center">
+                                    <div wire:click="viewTask('{{ $task->id }}')"
+                                        class="flex-grow cursor-pointer pr-4">
+                                        <h4 class="font-bold text-gray-800 dark:text-gray-200">{{ $task->title }}</h4>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Deadline:
+                                            {{ $task->deadline->format('d M Y') }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-4 flex-shrink-0">
+                                        <select
+                                            wire:change="updateTaskStatus('{{ $task->id }}', $event.target.value)"
+                                            wire:click.stop
+                                            class="border-none bg-transparent text-xs font-semibold uppercase leading-5 rounded-full appearance-none focus:outline-none focus:ring-0
+        {{ $task->status === 'TODO' ? 'text-yellow-800 dark:text-yellow-100 bg-yellow-100 dark:bg-yellow-800/50' : '' }}
+        {{ $task->status === 'IN-PROGRESS' ? 'text-blue-800 dark:text-blue-100 bg-blue-100 dark:bg-blue-800/50' : '' }}
+        {{ $task->status === 'DONE' ? 'text-green-800 dark:text-green-100 bg-green-100 dark:bg-green-800/50' : '' }}
+    ">
+                                            <option value="TODO" @if ($task->status === 'TODO') selected @endif>TO
+                                                DO</option>
+                                            <option value="IN-PROGRESS"
+                                                @if ($task->status === 'IN-PROGRESS') selected @endif>IN PROGRESS</option>
+                                            <option value="DONE" @if ($task->status === 'DONE') selected @endif>
+                                                DONE</option>
+                                        </select>
+                                        <button wire:click="confirmTaskDelete('{{ $task->id }}')" wire:click.stop
+                                            class="text-sm font-medium text-red-600 hover:text-red-900">Delete</button>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center text-gray-500 dark:text-gray-400 py-8">No tasks found with
+                                    current filters.</div>
+                            @endforelse
+                        </div>
                     </div>
-                </div>
+                @endif
+
+                {{-- mode kanban --}}
+                @if ($viewMode === 'kanban')
+                    <div x-data="{
+                        init() {
+                            document.querySelectorAll('.kanban-column').forEach(column => {
+                                new Sortable(column, {
+                                    group: 'tasks',
+                                    animation: 150,
+                                    ghostClass: 'bg-blue-100',
+                                    onEnd: (evt) => {
+                                        let taskId = evt.item.dataset.id;
+                                        let newStatus = evt.to.dataset.status;
+                                        @this.call('updateTaskStatus', taskId, newStatus);
+                                    }
+                                });
+                            });
+                        }
+                    }" x-init="init()">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                            @php
+                                $statuses = ['TODO', 'IN-PROGRESS', 'DONE'];
+                                $tasksByStatus = $project->tasks->groupBy('status');
+                            @endphp
+
+                            @foreach ($statuses as $status)
+                                <div class="bg-gray-100 dark:bg-gray-800/50 rounded-lg p-3">
+                                    <h4 class="font-bold text-sm uppercase text-gray-500 dark:text-gray-400 mb-3 px-1">
+                                        {{ str_replace('-', ' ', $status) }}</h4>
+
+                                    <div data-status="{{ $status }}"
+                                        class="kanban-column space-y-3 min-h-[100px]">
+                                        @forelse ($tasksByStatus[$status] ?? [] as $task)
+                                            <div wire:key="task-{{ $task->id }}" data-id="{{ $task->id }}"
+                                                class="bg-white dark:bg-gray-700 shadow rounded-lg p-3 cursor-grab group">
+                                                <div wire:click="viewTask('{{ $task->id }}')"
+                                                    class="cursor-pointer">
+                                                    <div class="flex items-center justify-between">
+                                                        <p
+                                                            class="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                                            {{ $task->title }}
+                                                        </p>
+                                                        {{-- Ikon diletakkan di sini --}}
+                                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="h-4 w-4 text-gray-400" fill="none"
+                                                            viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536l12.232-12.232z" />
+                                                        </svg>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        Deadline: {{ $task->deadline->format('d M Y') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @empty
+                                            {{-- Placeholder supaya kolom bisa menjadi target drop --}}
+                                        @endforelse
+                                    </div>
+                                </div>
+                            @endforeach
+
+                        </div>
+                    </div>
+                @endif
+
+                @if (session()->has('task_message'))
+                    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+                        <p>{{ session('task_message') }}</p>
+                    </div>
+                @endif
             </div>
 
             {{-- modal add new task --}}

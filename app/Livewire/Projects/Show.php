@@ -53,7 +53,19 @@ class Show extends Component
     public string $filterStatus = '';
     public string $filterDeadline = '';
 
+    //view mode
+    public string $viewMode = 'list'; 
 
+
+    //view mode
+    public function setViewMode(string $mode)
+    {
+        // Pastikan mode yang dipilih valid
+        if (in_array($mode, ['list', 'kanban'])) {
+            $this->viewMode = $mode;
+        }
+    }
+    
     //project
     public function startEditing(string $field): void
     {
