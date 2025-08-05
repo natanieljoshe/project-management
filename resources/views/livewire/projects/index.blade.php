@@ -41,7 +41,7 @@
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $project->name }}</h3>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            {{ Str::limit($project->description, 100) }}
+                            {{ Str::limit($project->description, 45) }}
                         </p>
                         <div class="mt-4 flex justify-between items-center">
                             <span class="text-xs font-medium text-gray-500 dark:text-gray-300">
