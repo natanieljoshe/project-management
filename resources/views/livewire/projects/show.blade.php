@@ -37,9 +37,37 @@
             {{-- kolom kanan: daftar tugas --}}
             <div class="md:col-span-2">
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+
+                    {{-- judul tasks --}}
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Tasks</h3>
                         <x-primary-button wire:click="openTaskModal()">+ New Task</x-primary-button>
+                    </div>
+
+                    {{-- filter dan search --}}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <x-text-input wire:model.live.debounce.300ms="searchQuery" type="text" class="w-full"
+                                placeholder="Search by title..." />
+                        </div>
+                        <div>
+                            <select wire:model.live="filterStatus"
+                                class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <option value="">All Status</option>
+                                <option value="TODO">To Do</option>
+                                <option value="IN-PROGRESS">In Progress</option>
+                                <option value="DONE">Done</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select wire:model.live="filterDeadline"
+                                class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <option value="">All Deadlines</option>
+                                <option value="today">Today</option>
+                                <option value="past">Past Due</option>
+                                <option value="future">Incoming</option>
+                            </select>
+                        </div>
                     </div>
 
                     @if (session()->has('task_message'))
@@ -49,7 +77,7 @@
                     @endif
 
                     <div class="space-y-4">
-                        @forelse ($project->tasks as $task)
+                        @forelse ($tasks as $task)
                             <div wire:key="task-{{ $task->id }}" wire:click="viewTask('{{ $task->id }}')"
                                 class="border dark:border-gray-700 rounded-lg p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                                 <div>
@@ -213,6 +241,7 @@
                         </div>
                     </div>
 
+                    {{-- edit deskripsi --}}
                     <div wire:click="startEditingDescription('{{ $viewingTask->id }}')"
                         class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 mt-4 cursor-pointer p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/50">
                         @if ($editingTaskDescriptionId === $viewingTask->id)
@@ -231,6 +260,45 @@
                             @else
                                 <p class="text-gray-400">No description. Click to add.</p>
                             @endif
+                        @endif
+                    </div>
+
+                    {{-- upload file --}}
+                    <div class="mt-6 border-t dark:border-gray-700 pt-4">
+                        <h4 class="font-bold text-gray-900 dark:text-gray-100 mb-2">Attachment</h4>
+
+                        @if (session()->has('file_message'))
+                            <div class="bg-green-100 text-green-700 p-3 rounded-md mb-4 text-sm">
+                                {{ session('file_message') }}</div>
+                        @endif
+
+                        @if ($viewingTask->file_path)
+                            <div class="flex items-center justify-between">
+                                <a href="{{ asset('storage/' . $viewingTask->file_path) }}" target="_blank"
+                                    class="text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    <span>{{ basename($viewingTask->file_path) }}</span>
+                                </a>
+                                <button wire:click="deleteFile('{{ $viewingTask->id }}')"
+                                    wire:confirm="Are you sure you want to delete this file ?"
+                                    class="text-xs font-medium text-red-600 hover:text-red-900">
+                                    Remove
+                                </button>
+                            </div>
+                        @else
+                            <div>
+                                <input type="file" wire:model.live="file" id="task-file-{{ $viewingTask->id }}"
+                                    class="text-sm">
+
+                                <div wire:loading wire:target="file" class="text-sm text-gray-500 mt-2">Uploading...
+                                </div>
+
+                                <x-input-error :messages="$errors->get('file')" class="mt-2" />
+                            </div>
                         @endif
                     </div>
                 @endif

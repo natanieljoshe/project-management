@@ -7,18 +7,26 @@ use App\Models\Project;
 use App\Models\Task;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\WithFileUploads; 
+use Illuminate\Support\Facades\Storage; 
 
 #[Layout('layouts.app')]
 class Show extends Component
-{
+{   
+    use WithFileUploads;
+
+    //untuk upload file
+    public $file;
     //menampung data project
     public Project $project;
 
+    //data dari task
     public string $title = '';
     public string $description = '';
     public string $deadline = '';
     public string $status = '';
     
+    //modal task
     public bool $isTaskModalOpen = false;
     public ?string $editingTaskId = null;
     public ?string $editingTaskDateId = null;
@@ -34,6 +42,11 @@ class Show extends Component
 
     public ?string $editingTaskDescriptionId = null;
     public string $newDescription = '';
+
+    //filter dan search
+    public string $searchQuery = '';
+    public string $filterStatus = '';
+    public string $filterDeadline = '';
 
     //validasi untuk task baru
     protected function rules()
@@ -261,8 +274,74 @@ class Show extends Component
         $this->closeViewTaskModal();
     }
 
+    public function updatedFile()
+{
+    //validasi file, tipe file bebas, maks 10MB (10240 KB)
+    $this->validate([
+        'file' => 'required|file|max:10240', 
+    ]);
+
+    // ambil tugas yang sedang dilihat
+    $task = $this->viewingTask;
+    
+    // hapus file lama jika ada
+    if ($task->file_path) {
+        Storage::disk('public')->delete($task->file_path);
+    }
+    
+    $path = $this->file->store('task-files', 'public');
+    
+    $task->update(['file_path' => $path]);
+
+    // Refresh data dan reset input file
+    $this->viewingTask->refresh();
+    $this->reset('file');
+
+    session()->flash('file_message', 'File successfully uploaded.');
+}
+
+    public function deleteFile(string $taskId)
+    {
+        $task = Task::findOrFail($taskId);
+        
+        // Hapus file dari storage
+        Storage::disk('public')->delete($task->file_path);
+        
+        $task->update(['file_path' => null]);
+        
+        $this->viewingTask->refresh();
+        session()->flash('file_message', 'File successfully removed.');
+    }
+
+
     public function render()
     {
-        return view('livewire.projects.show');
+        $tasksQuery = $this->project->tasks()->orderBy('created_at');
+
+        // filter pencarian
+        if ($this->searchQuery) {
+            $tasksQuery->where('title', 'like', '%' . $this->searchQuery . '%');
+        }
+
+        // filter status
+        if ($this->filterStatus) {
+            $tasksQuery->where('status', $this->filterStatus);
+        }
+        
+        //filter deadline
+        if ($this->filterDeadline) {
+            match ($this->filterDeadline) {
+                'today' => $tasksQuery->whereDate('deadline', today()),
+                'past' => $tasksQuery->whereDate('deadline', '<', today()),
+                'future' => $tasksQuery->whereDate('deadline', '>', today()),
+                default => null,
+            };
+        }
+        
+        $tasks = $tasksQuery->get();
+
+        return view('livewire.projects.show', [
+            'tasks' => $tasks,
+        ]);
     }
 }
