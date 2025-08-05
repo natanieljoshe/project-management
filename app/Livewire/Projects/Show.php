@@ -98,7 +98,7 @@ class Show extends Component
                 $updatePayload['description'] = $validatedData['newProjectDescription'];
                 break;
             case 'deadline':
-                $validatedData = $this->validate(['newProjectDeadline' => 'required|date']);
+                $validatedData = $this->validate(['newProjectDeadline' => 'required|date|after_or_equal:today']);
                 $updatePayload['deadline'] = $validatedData['newProjectDeadline'];
                 break;
             case 'status':
@@ -121,7 +121,7 @@ class Show extends Component
         return [
             'title' => 'required|string|min:3',
             'description' => 'nullable|string',
-            'deadline' => 'required|date',
+            'deadline' => 'required|date|after_or_equal:today',
             'status' => 'required|in:TODO,IN-PROGRESS,DONE',
         ];
     }
@@ -158,7 +158,7 @@ class Show extends Component
         $validated = $this->validate([
             'title' => 'required|string|min:3',
             'description' => 'nullable|string',
-            'deadline' => 'required|date',
+            'deadline' => 'required|date|after_or_equal:today',
         ]);
         
         $this->project->tasks()->create($validated);
@@ -250,7 +250,7 @@ class Show extends Component
 
     public function updateTaskDate(): void
     {
-        $this->validate(['newDeadline' => 'required|date']);
+        $this->validate(['newDeadline' => 'required|date|after_or_equal:today']);
         
         $task = Task::findOrFail($this->editingTaskDateId);
         $task->update(['deadline' => $this->newDeadline]);

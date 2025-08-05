@@ -27,7 +27,7 @@ class Index extends Component
         return [
             'name' => 'required|string|min:3',
             'description' => 'nullable|string',
-            'deadline' => 'required|date',
+            'deadline' => 'required|date|after_or_equal:today',
             'status' => 'required|string',
         ];
     }
