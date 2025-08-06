@@ -1,4 +1,4 @@
 # nixpacks.toml
 
 [phases.setup]
-nixPkgs = ["pkgs.apacheHttpd"]
+nixPkgs = ["pkgs.php83", "pkgs.composer", "pkgs.apacheHttpd"]
