@@ -83,6 +83,11 @@ class Index extends Component
         return Excel::download(new ProjectsExport, 'projects-and-tasks.xlsx');
     }
 
+    public function viewProject(string $projectId)
+    {
+        return $this->redirect(route('projects.show', $projectId), navigate: true);
+    }
+
     public function render()
     {
         // ambil semua project, urutkan dari yang terbaru

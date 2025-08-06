@@ -21,7 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'priority_project_id', // Pastikan ini ada
+        'priority_project_id',
+        'google_id',
     ];
 
     /**

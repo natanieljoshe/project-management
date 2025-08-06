@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Dashboard;
+use App\Http\Controllers\SocialiteController;
+
+Route::get('/auth/google/redirect', [SocialiteController::class, 'redirect'])->name('google.redirect');
+Route::get('/auth/google/callback', [SocialiteController::class, 'callback'])->name('google.callback');
 
 Route::view('/', 'welcome');
 

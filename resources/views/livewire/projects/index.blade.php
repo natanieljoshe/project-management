@@ -38,7 +38,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {{-- loop untuk setiap project --}}
                 @forelse ($projects as $project)
-                    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 transition hover:shadow-lg">
+                    <div wire:click="viewProject('{{ $project->id }}')"
+                        class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 transition hover:shadow-lg cursor-pointer">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $project->name }}</h3>
                         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                             {{ Str::limit($project->description, 45) }}
@@ -53,11 +54,11 @@
                             </span>
                         </div>
                         <div class="mt-4 border-t dark:border-gray-700 pt-4 flex justify-between items-center">
-                            <a href="{{ route('projects.show', $project) }}" wire:navigate
+                            <a href="{{ route('projects.show', $project) }}" wire:navigate wire:click.stop
                                 class="inline-flex items-center px-3 py-1 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 {{ __('Manage') }}
                             </a>
-                            <button wire:click="confirmDelete('{{ $project->id }}')"
+                            <button wire:click.stop="confirmDelete('{{ $project->id }}')"
                                 class="font-medium text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">
                                 Delete
                             </button>
