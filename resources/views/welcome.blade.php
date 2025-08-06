@@ -98,7 +98,7 @@
 </head>
 
 <body class="antialiased bg-gray-100 dark:bg-gray-900">
-
+    <x-preloader />
     {{-- tombol login dan register --}}
     <div class="fixed top-0 right-0 p-6 z-50">
         @if (Route::has('login'))
