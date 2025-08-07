@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
+# Exit on error
 set -o errexit
 
+# Install Composer dependencies
 composer install --no-dev --no-interaction --optimize-autoloader
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
+# Langsung jalankan migrasi
 php artisan migrate --force
