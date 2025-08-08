@@ -144,7 +144,7 @@
 
         <section id="section4" class="section">
             <div id="final-destination">
-                <a href="{{ route('login') }}" id="get-started-btn"
+                <a href="{{ route('register') }}" id="get-started-btn"
                     class="relative inline-block px-8 py-4 bg-black text-white font-bold text-xl rounded-lg transition-all duration-300 ease-out hover:bg-slate-800 hover:scale-105 active:scale-100 overflow-hidden group">
 
                     <span class="relative z-10">Get Started</span>
